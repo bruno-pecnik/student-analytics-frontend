@@ -7,9 +7,9 @@ function getToken() {
 
 // login poziv
 export async function login(email, password) {
-  const response = await fetch(`${API_URL}/api/auth/login`, {
+  const response = await fetch(`${API_URL}/api/auth/login`, { // response je cijeli odgovor s backenda, ne samo data već i status #, header, body ...
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' }, // šaljem podatke u JSON formatu
     body: JSON.stringify({ email, password }),
   });
   const data = await response.json();
@@ -19,25 +19,28 @@ export async function login(email, password) {
   return data;
 }
 
+// dohvati podatak
 export async function get(path) {
-  const response = await fetch(`${API_URL}${path}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
+  const response = await fetch(`${API_URL}${path}`, { // šalje zahtjev backendu na API_URL (URL backenda)
+                                                        // zahtjev za GET je po defaultu, ne treba ga pisat
+    headers: { Authorization: `Bearer ${getToken()}` }, // pošalje token u requestu kao header 
   });
-  const data = await response.json();
+  const data = await response.json(); // odgovor backenda pretvara u JS objekt 'data' kako bismo koristili te podatke
   if (!response.ok) {
     throw new Error(data.message || 'Greška.');
   }
   return data;
 }
 
+// pošalji novi podatak
 export async function post(path, body) {
   const response = await fetch(`${API_URL}${path}`, {
-    method: 'POST',
+    method: 'POST', // zahtjev za POST
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${getToken()}`,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body), // JSON treba pretvorit u string
   });
   const data = await response.json();
   if (!response.ok) {
@@ -46,9 +49,10 @@ export async function post(path, body) {
   return data;
 }
 
+// promijeni podatak
 export async function put(path, body) {
-  const response = await fetch(`${API_URL}${path}`, {
-    method: 'PUT',
+  const response = await fetch(`${API_URL}${path}`, { 
+    method: 'PUT', // zahtjev za PUT
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${getToken()}`,
@@ -62,9 +66,10 @@ export async function put(path, body) {
   return data;
 }
 
-export async function del(path) {
+// izbriši podatak
+export async function del(path) { 
   const response = await fetch(`${API_URL}${path}`, {
-    method: 'DELETE',
+    method: 'DELETE', // zahtjev za DELETE
     headers: { Authorization: `Bearer ${getToken()}` },
   });
   if (!response.ok) {
