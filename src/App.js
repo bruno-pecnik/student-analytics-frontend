@@ -4,6 +4,7 @@ import { Layout } from 'antd';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar';
+import ProfilPage from './pages/ProfilPage';
 
 const { Content } = Layout; // antdesign, kontenjer za stranicu
 
@@ -24,6 +25,7 @@ function App() {
               <Content style={{ padding: 24 }}> 
                 <Routes>
                   <Route path="/home" element={<HomePage />} />
+                  <Route path="/profil" element={<ProfilPage />} />
                 </Routes>
               </Content>
             </Layout>
