@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar';
 import ProfilPage from './pages/ProfilPage';
+import AdminPage from './pages/AdminPage';
+
 
 const { Content } = Layout; // antdesign, kontenjer za stranicu
 
@@ -26,6 +28,7 @@ function App() {
                 <Routes>
                   <Route path="/home" element={<HomePage />} />
                   <Route path="/profil" element={<ProfilPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
                 </Routes>
               </Content>
             </Layout>
