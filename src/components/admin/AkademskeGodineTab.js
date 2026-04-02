@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input } from 'antd';
 import { get, post } from '../../services/api';
+import { Table, Button, Modal, Form, Input, DatePicker } from 'antd';
+import locale from 'antd/es/date-picker/locale/hr_HR';
 
 function AkademskeGodineTab() {
   const [godine, setGodine] = useState([]); // objekti akademskih godina, prazna lista, mijenja se sa setGodine
@@ -24,8 +25,8 @@ function AkademskeGodineTab() {
     try {
       await post('/api/academic-years', { // backednu pošalje što je user napisao u formi
         name: values.name,
-        startDate: values.startDate,
-        endDate: values.endDate,
+        startDate: values.startDate.format('YYYY-MM-DD'), // backendu se šalje format YYYY-
+        endDate: values.endDate.format('YYYY-MM-DD'),
       });
       setModalOtvoren(false); // zatvaramo popup nakon što je backend učitao podatke
       form.resetFields(); // očisti input forme
@@ -63,11 +64,27 @@ function AkademskeGodineTab() {
           <Form.Item label="Naziv" name="name" rules={[{ required: true, message: 'Naziv je obavezan.' }]}>
             <Input placeholder="npr. 2025./2026." />
           </Form.Item>
-          <Form.Item label="Datum početka" name="startDate" rules={[{ required: true, message: 'Datum početka je obavezan.' }]}>
-            <Input placeholder="npr. 01-10-2026" />
+          <Form.Item
+            label="Datum početka"
+            name="startDate"
+            rules={[{ required: true, message: 'Datum početka je obavezan.' }]}
+          >
+            <DatePicker
+              format="DD.MM.YYYY" // format prikaza korisniku je DD-
+              locale={locale}
+              style={{ width: '100%' }}
+            /> 
           </Form.Item>
-          <Form.Item label="Datum završetka" name="endDate" rules={[{ required: true, message: 'Datum završetka je obavezan.' }]}>
-            <Input placeholder="npr. 30-09-2026" />
+          <Form.Item
+            label="Datum završetka"
+            name="endDate"
+            rules={[{ required: true, message: 'Datum završetka je obavezan.' }]}
+          >
+            <DatePicker
+              format="DD.MM.YYYY" 
+              locale={locale}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
