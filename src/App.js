@@ -7,6 +7,8 @@ import Navbar from './components/Navbar';
 import ProfilPage from './pages/ProfilPage';
 import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
+import RezultatiPage from './pages/RezultatiPage';
+
 
 
 const { Content } = Layout; // antdesign, kontenjer za stranicu
@@ -30,6 +32,7 @@ function App() {
                   <Route path="/home" element={<HomePage />} />
                   <Route path="/profil" element={<ProfilPage />} />
                   <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/rezultati" element={<RezultatiPage />} />
                   <Route path="*" element={<NotFoundPage />} /> {/* ako nijedna ruta ne postoji pokaži NotFoundPage */}
                 </Routes>
               </Content>
