@@ -6,6 +6,9 @@ import { get } from '../services/api';
 const { Title, Text } = Typography;
 
 function RezultatiPage() {
+  const user = JSON.parse(localStorage.getItem('user')); // dohvati ulogiranog korisnika
+  const isStudent = user?.role === 'STUDENT'; // provjeri je li student
+
   // podaci iz baze
   const [akademskeGodine, setAkademskeGodine] = useState([]);
   const [kolegiji, setKolegiji] = useState([]);
@@ -14,17 +17,21 @@ function RezultatiPage() {
   const [upisi, setUpisi] = useState([]);
   const [zapisi, setZapisi] = useState([]);
 
-  // odabrani filteri
+  // odabrani filteri (samo za admin/profesor)
   const [odabranaGodina, setOdabranaGodina] = useState(null);
   const [odabraniKolegij, setOdabraniKolegij] = useState(null);
   const [odabranaGrupa, setOdabranaGrupa] = useState(null);
 
-  // učitaj akademske godine kad se stranica otvori
+  // učitaj podatke kad se stranica otvori
   useEffect(() => {
-    dohvatiAkademskeGodine();
+    if (isStudent) {
+      dohvatiUpiseStuenta(); // student automatski vidi svoje upise
+    } else {
+      dohvatiAkademskeGodine(); // admin/profesor vidi filtere
+    }
   }, []);
 
-  // kad se odabere godina, učitaj kolegije
+  // kad se odabere godina, učitaj kolegije (samo admin/profesor)
   useEffect(() => {
     if (odabranaGodina) {
       dohvatiKolegije(odabranaGodina);
@@ -55,10 +62,17 @@ function RezultatiPage() {
     }
   }, [odabranaGrupa]);
 
-  // kad se učitaju upisi, učitaj zapise za svaki upis
+  // kad se učitaju upisi, učitaj zapise
   useEffect(() => {
     if (upisi.length > 0) {
       dohvatiZapise();
+    }
+  }, [upisi]);
+
+  // kad student učita svoje upise, dohvati komponente za svaki kolegij
+  useEffect(() => {
+    if (isStudent && upisi.length > 0) {
+      dohvatiKomponenteZaStudenta();
     }
   }, [upisi]);
 
@@ -107,9 +121,40 @@ function RezultatiPage() {
     }
   };
 
+  // dohvati upise za ulogiranog studenta
+  const dohvatiUpiseStuenta = async () => {
+    try {
+      const data = await get(`/api/enrollments/by-student/${user.id}`);
+      setUpisi(data);
+    } catch (err) {
+      console.error('Greška:', err.message);
+    }
+  };
+
+  // dohvati komponente za sve kolegije studenta
+  const dohvatiKomponenteZaStudenta = async () => {
+    try {
+      const sveKomponente = [];
+      for (const upis of upisi) {
+        const kolegijId = upis.group?.course?.id;
+        if (kolegijId) {
+          const data = await get(`/api/grade-components/by-course/${kolegijId}`);
+          for (const komponenta of data) {
+            // dodaj samo ako već nije u listi
+            if (!sveKomponente.find(k => k.id === komponenta.id)) {
+              sveKomponente.push(komponenta);
+            }
+          }
+        }
+      }
+      setKomponente(sveKomponente);
+    } catch (err) {
+      console.error('Greška:', err.message);
+    }
+  };
+
   const dohvatiZapise = async () => {
     try {
-      // za svaki upis dohvati zapise i spoji u jednu listu
       const sviZapisi = [];
       for (const upis of upisi) {
         const data = await get(`/api/records/by-enrollment/${upis.id}`);
@@ -123,15 +168,13 @@ function RezultatiPage() {
     }
   };
 
-  // pripremi podatke za graf - prosjek po komponenti
+  // pripremi podatke za graf, prosjek po komponenti
   const podaciZaGraf = () => {
     const rezultat = [];
     for (const komponenta of komponente) {
-      // pronađi sve zapise za ovu komponentu
       const zapisZaKomponentu = zapisi.filter(z => z.component?.id === komponenta.id);
       if (zapisZaKomponentu.length === 0) continue;
 
-      // izračunaj prosjek
       let ukupno = 0;
       for (const zapis of zapisZaKomponentu) {
         ukupno += zapis.points || 0;
@@ -140,14 +183,14 @@ function RezultatiPage() {
 
       rezultat.push({
         naziv: komponenta.name,
-        prosjek: Math.round(prosjek * 10) / 10, // zaokruži na 1 decimalu
+        prosjek: Math.round(prosjek * 10) / 10,
         maksimum: komponenta.maxPoints,
       });
     }
     return rezultat;
   };
 
-  // pripremi podatke za tablicu studenata
+  // pripremi podatke za tablicu, za studenta prikazuje samo njegove rezultate
   const podaciZaTablicu = () => {
     const rezultat = [];
     for (const upis of upisi) {
@@ -156,9 +199,9 @@ function RezultatiPage() {
         key: upis.id,
         ime: student?.firstName + ' ' + student?.lastName,
         email: student?.email,
+        kolegij: upis.group?.course?.name || '-', // student vidi i naziv kolegija
       };
 
-      // dodaj bodove za svaku komponentu
       for (const komponenta of komponente) {
         const zapis = zapisi.find(
           z => z.enrollment?.id === upis.id && z.component?.id === komponenta.id
@@ -166,7 +209,6 @@ function RezultatiPage() {
         row[komponenta.id] = zapis?.points ?? '-';
       }
 
-      // izračunaj ukupno - ispravljeno: points != null umjesto points (da se 0 bodova računa)
       let ukupno = 0;
       for (const zapis of zapisi) {
         if (zapis.enrollment?.id === upis.id && zapis.points != null) {
@@ -180,14 +222,16 @@ function RezultatiPage() {
     return rezultat;
   };
 
-  // stupci za tablicu - dinamički ovisno o komponentama
   const stupciTablice = () => {
-    const osnovni = [
-      { title: 'Student', dataIndex: 'ime', key: 'ime' },
-      { title: 'Email', dataIndex: 'email', key: 'email' },
-    ];
+    const osnovni = isStudent
+      ? [
+          { title: 'Kolegij', dataIndex: 'kolegij', key: 'kolegij' }, // student vidi kolegij
+        ]
+      : [
+          { title: 'Student', dataIndex: 'ime', key: 'ime' }, // admin/profesor vidi ime studenta
+          { title: 'Email', dataIndex: 'email', key: 'email' },
+        ];
 
-    // dodaj stupac za svaku komponentu
     for (const komponenta of komponente) {
       osnovni.push({
         title: `${komponenta.name} (max ${komponenta.maxPoints})`,
@@ -210,54 +254,56 @@ function RezultatiPage() {
     <div style={{ padding: 24 }}>
       <Title level={2}>Rezultati</Title>
 
-      {/* filteri - moderan Ant Design 5 način s options propom */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={8}>
-          <Text strong>Akademska godina</Text>
-          <Select
-            style={{ width: '100%', marginTop: 8 }}
-            placeholder="Odaberi godinu"
-            onChange={(value) => setOdabranaGodina(value)}
-            value={odabranaGodina}
-            options={akademskeGodine.map(godina => ({
-              value: godina.id,
-              label: godina.name,
-            }))}
-          />
-        </Col>
+      {/* filteri samo za admin/profesor */}
+      {!isStudent && (
+        <Row gutter={16} style={{ marginBottom: 24 }}>
+          <Col xs={24} sm={8}>
+            <Text strong>Akademska godina</Text>
+            <Select
+              style={{ width: '100%', marginTop: 8 }}
+              placeholder="Odaberi godinu"
+              onChange={(value) => setOdabranaGodina(value)}
+              value={odabranaGodina}
+              options={akademskeGodine.map(godina => ({
+                value: godina.id,
+                label: godina.name,
+              }))}
+            />
+          </Col>
 
-        <Col xs={24} sm={8}>
-          <Text strong>Kolegij</Text>
-          <Select
-            style={{ width: '100%', marginTop: 8 }}
-            placeholder="Odaberi kolegij"
-            onChange={(value) => setOdabraniKolegij(value)}
-            value={odabraniKolegij}
-            disabled={!odabranaGodina}
-            options={kolegiji.map(kolegij => ({
-              value: kolegij.id,
-              label: kolegij.name,
-            }))}
-          />
-        </Col>
+          <Col xs={24} sm={8}>
+            <Text strong>Kolegij</Text>
+            <Select
+              style={{ width: '100%', marginTop: 8 }}
+              placeholder="Odaberi kolegij"
+              onChange={(value) => setOdabraniKolegij(value)}
+              value={odabraniKolegij}
+              disabled={!odabranaGodina}
+              options={kolegiji.map(kolegij => ({
+                value: kolegij.id,
+                label: kolegij.name,
+              }))}
+            />
+          </Col>
 
-        <Col xs={24} sm={8}>
-          <Text strong>Grupa</Text>
-          <Select
-            style={{ width: '100%', marginTop: 8 }}
-            placeholder="Odaberi grupu"
-            onChange={(value) => setOdabranaGrupa(value)}
-            value={odabranaGrupa}
-            disabled={!odabraniKolegij}
-            options={grupe.map(grupa => ({
-              value: grupa.id,
-              label: grupa.name,
-            }))}
-          />
-        </Col>
-      </Row>
+          <Col xs={24} sm={8}>
+            <Text strong>Grupa</Text>
+            <Select
+              style={{ width: '100%', marginTop: 8 }}
+              placeholder="Odaberi grupu"
+              onChange={(value) => setOdabranaGrupa(value)}
+              value={odabranaGrupa}
+              disabled={!odabraniKolegij}
+              options={grupe.map(grupa => ({
+                value: grupa.id,
+                label: grupa.name,
+              }))}
+            />
+          </Col>
+        </Row>
+      )}
 
-      {/* graf - vidljiv kad ima podataka */}
+      {/* graf uvijek vidljiv kad ima podataka */}
       {podaciZaGraf().length > 0 && (
         <Card title="Prosjek bodova po komponenti" style={{ marginBottom: 24 }}>
           <ResponsiveContainer width="100%" height={300}>
@@ -274,9 +320,9 @@ function RezultatiPage() {
         </Card>
       )}
 
-      {/* tablica - vidljiva kad je odabrana grupa */}
-      {odabranaGrupa && (
-        <Card title="Rezultati studenata">
+      {/* tablica */}
+      {(odabranaGrupa || isStudent) && (
+        <Card title={isStudent ? 'Moji rezultati' : 'Rezultati studenata'}>
           <Table
             columns={stupciTablice()}
             dataSource={podaciZaTablicu()}
@@ -286,8 +332,8 @@ function RezultatiPage() {
         </Card>
       )}
 
-      {/* poruka ako ništa nije odabrano */}
-      {!odabranaGodina && (
+      {/* poruka ako ništa nije odabrano (samo za admin/profesor) */}
+      {!isStudent && !odabranaGodina && (
         <Card>
           <Text type="secondary">Odaberite akademsku godinu za prikaz rezultata.</Text>
         </Card>
