@@ -8,8 +8,7 @@ import ProfilPage from './pages/ProfilPage';
 import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
 import RezultatiPage from './pages/RezultatiPage';
-
-
+import ProtectedRoute from './components/ProtectedRoute';
 
 const { Content } = Layout; // antdesign, kontenjer za stranicu
 
@@ -19,7 +18,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* ovo je za login stranicu (bez navbara) */}
+        {/* login stranica bez navbara */}
         <Route path="/login" element={<LoginPage />} />
 
         {/* sve ostale stranice sa navbarom */}
@@ -27,13 +26,21 @@ function App() {
           isLoggedIn ? (
             <Layout style={{ minHeight: '100vh' }}>
               <Navbar />
-              <Content style={{ padding: 24 }}> 
+              <Content style={{ padding: 24 }}>
                 <Routes>
                   <Route path="/home" element={<HomePage />} />
                   <Route path="/profil" element={<ProfilPage />} />
-                  <Route path="/admin" element={<AdminPage />} />
                   <Route path="/rezultati" element={<RezultatiPage />} />
-                  <Route path="*" element={<NotFoundPage />} /> {/* ako nijedna ruta ne postoji pokaži NotFoundPage */}
+
+                  {/* admin stranica, samo ADMIN može ući */}
+                  <Route path="/admin" element={
+                    <ProtectedRoute dozvoljeneUloge={['ADMIN']}>
+                      <AdminPage />
+                    </ProtectedRoute>
+                  } />
+
+                  {/* ako nijedna ruta ne postoji, pokaži 404 */}
+                  <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </Content>
             </Layout>
