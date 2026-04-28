@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://student-analytics-production-54e9.up.railway.app';
 
 // dohvati token iz lokalnog memorije
 function getToken() {
