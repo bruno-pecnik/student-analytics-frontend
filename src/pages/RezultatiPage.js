@@ -305,7 +305,7 @@ function RezultatiPage() {
       )}
 
       {/* unos rezultata - samo za admina i profesora */}
-        {!isStudent && odabraniKolegij && komponente.length > 0 && (
+        {!isStudent && odabranaGrupa && komponente.length > 0 && (
           <UnosRezultata
             kolegijId={odabraniKolegij}
             komponente={komponente}
