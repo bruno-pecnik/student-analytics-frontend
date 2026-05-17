@@ -254,6 +254,7 @@ function RezultatiPage() {
   console.log('isStudent:', isStudent);
   console.log('odabranaGrupa:', odabranaGrupa);
   console.log('komponente.length:', komponente.length);
+  console.log(user);
 
   return (
     <div style={{ padding: 24 }}>
