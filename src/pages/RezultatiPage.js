@@ -309,8 +309,13 @@ function RezultatiPage() {
         </Row>
       )}
 
-      <Button type="primary">TEST GUMB</Button>
-
+      {!isStudent && odabranaGrupa && komponente.length > 0 && (
+        <UnosRezultata
+        kolegijId={odabraniKolegij}
+        komponente={komponente}
+        onSuccess={dohvatiZapise}
+      />
+      )}
       {/* graf uvijek vidljiv kad ima podataka */}
       {podaciZaGraf().length > 0 && (
         <Card title="Prosjek bodova po komponenti" style={{ marginBottom: 24 }}>
