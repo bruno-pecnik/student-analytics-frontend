@@ -310,11 +310,9 @@ function RezultatiPage() {
 
       {/* unos rezultata - samo za admina i profesora */}
         {!isStudent && odabranaGrupa && komponente.length > 0 && (
-          <UnosRezultata
-            kolegijId={odabraniKolegij}
-            komponente={komponente}
-            onSuccess={dohvatiZapise}
-          />
+          <div style={{ background: 'red', padding: 20 }}>
+            TEST CSV GUMB
+          </div>
         )
       }
 
