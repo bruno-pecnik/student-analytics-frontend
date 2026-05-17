@@ -3,6 +3,8 @@ import { Typography, Tabs } from 'antd';
 import KorisniciTab from '../components/admin/KorisniciTab';
 import KolegijiTab from '../components/admin/KolegijiTab';
 import AkademskeGodineTab from '../components/admin/AkademskeGodineTab';
+import PravilaOcjenjivanjaTab from '../components/admin/PravilaOcjenjivanjaTab';
+
 
 const { Title } = Typography;
 
@@ -11,6 +13,7 @@ function AdminPage() {
     { key: '1', label: 'Korisnici', children: <KorisniciTab /> }, // children je što se prikaže kad kliknem
     { key: '2', label: 'Kolegiji', children: <KolegijiTab /> },
     { key: '3', label: 'Akademske godine', children: <AkademskeGodineTab /> },
+    { key: '4', label: 'Pravila ocjenjivanja', children: <PravilaOcjenjivanjaTab /> },
   ];
 
   return ( // ubaci tabove u stranicu
