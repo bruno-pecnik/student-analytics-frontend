@@ -3,7 +3,7 @@ import { Typography, Tabs } from 'antd';
 import KorisniciTab from '../components/admin/KorisniciTab';
 import KolegijiTab from '../components/admin/KolegijiTab';
 import AkademskeGodineTab from '../components/admin/AkademskeGodineTab';
-import PravilaOcjenjivanjaTab from '../components/admin/PravilaOcjenjivanjaTab';
+import PravilaOcjenjivanjaTab from '../components/admin/PravilaOcjenjivanjaTabs';
 
 
 const { Title } = Typography;
