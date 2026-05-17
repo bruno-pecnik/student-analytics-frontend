@@ -333,6 +333,29 @@ function RezultatiPage() {
         </Card>
       )}
 
+      {/* line chart - trend kroz akademske godine */}
+      {trendPodaci.length > 0 && (
+        <Card title="Trend prosjeka kroz akademske godine" style={{ marginBottom: 24 }}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={trendPodaci}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="godina" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="prosjek"
+                name="Prosjek bodova"
+                stroke="#1677ff"
+                strokeWidth={2}
+                dot={{ r: 5 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
+
       {/* tablica */}
       {(odabranaGrupa || isStudent) && (
         <Card title={isStudent ? 'Moji rezultati' : 'Rezultati studenata'}>
