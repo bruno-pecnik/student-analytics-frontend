@@ -251,6 +251,10 @@ function RezultatiPage() {
     return osnovni;
   };
 
+  console.log('isStudent:', isStudent);
+  console.log('odabranaGrupa:', odabranaGrupa);
+  console.log('komponente.length:', komponente.length);
+
   return (
     <div style={{ padding: 24 }}>
       <Title level={2}>Rezultati</Title>
