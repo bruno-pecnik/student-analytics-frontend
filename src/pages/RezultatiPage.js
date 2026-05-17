@@ -309,7 +309,7 @@ function RezultatiPage() {
       )}
 
       {/* unos rezultata - samo za admina i profesora */}
-        {!isStudent && odabranaGrupa && komponente.length > 0 && (
+        {true && (
           <div style={{ background: 'red', padding: 20 }}>
             TEST CSV GUMB
           </div>
