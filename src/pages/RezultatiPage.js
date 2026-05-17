@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Select, Row, Col, Card, Table } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { get } from '../services/api';
+import UnosRezultata from '../components/UnosRezultata';
 
 const { Title, Text } = Typography;
 
@@ -302,6 +303,16 @@ function RezultatiPage() {
           </Col>
         </Row>
       )}
+
+      {/* unos rezultata - samo za admina i profesora */}
+        {!isStudent && odabraniKolegij && komponente.length > 0 && (
+          <UnosRezultata
+            kolegijId={odabraniKolegij}
+            komponente={komponente}
+            onSuccess={dohvatiZapise}
+          />
+        )
+      }
 
       {/* graf uvijek vidljiv kad ima podataka */}
       {podaciZaGraf().length > 0 && (
