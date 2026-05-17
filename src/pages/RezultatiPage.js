@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Select, Row, Col, Card, Table } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { get } from '../services/api';
 import UnosRezultata from '../components/UnosRezultata';
