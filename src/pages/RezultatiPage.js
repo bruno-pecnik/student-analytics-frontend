@@ -3,6 +3,7 @@ import { Typography, Select, Row, Col, Card, Table } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { get } from '../services/api';
 import UnosRezultata from '../components/UnosRezultata';
+import { Typography, Select, Row, Col, Card, Table, Button } from 'antd';
 
 const { Title, Text } = Typography;
 
@@ -309,13 +310,7 @@ function RezultatiPage() {
         </Row>
       )}
 
-      {/* unos rezultata - samo za admina i profesora */}
-        {true && (
-          <div style={{ background: 'red', padding: 20 }}>
-            TEST CSV GUMB
-          </div>
-        )
-      }
+      <Button type="primary">TEST GUMB</Button>
 
       {/* graf uvijek vidljiv kad ima podataka */}
       {podaciZaGraf().length > 0 && (
