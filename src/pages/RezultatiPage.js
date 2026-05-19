@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { get } from '../services/api';
 import UnosRezultata from '../components/UnosRezultata';
 import { Typography, Select, Row, Col, Card, Table, Button } from 'antd';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const { Title, Text } = Typography;
 
@@ -17,6 +17,7 @@ function RezultatiPage() {
   const [komponente, setKomponente] = useState([]);
   const [upisi, setUpisi] = useState([]);
   const [zapisi, setZapisi] = useState([]);
+  const [trendPodaci, setTrendPodaci] = useState([]);
 
   // odabrani filteri (samo za admin/profesor)
   const [odabranaGodina, setOdabranaGodina] = useState(null);
@@ -76,6 +77,12 @@ function RezultatiPage() {
       dohvatiKomponenteZaStudenta();
     }
   }, [upisi]);
+
+  useEffect(() => {
+    if (odabraniKolegij) {
+      dohvatiTrend();
+    }
+  }, [odabraniKolegij]);
 
   const dohvatiAkademskeGodine = async () => {
     try {
@@ -168,6 +175,30 @@ function RezultatiPage() {
       console.error('Greška:', err.message);
     }
   };
+
+  const dohvatiTrend = async () => {
+  try {
+    const godine = await get('/api/academic-years');
+    const podaci = [];
+    const trenutniKolegiji = await get(`/api/courses/by-year/${odabranaGodina}`);
+    const trenutniKolegij = trenutniKolegiji.find(k => k.id === odabraniKolegij);
+
+    for (const godina of godine) {
+      const kolegiji = await get(`/api/courses/by-year/${godina.id}`);
+      const isti = kolegiji.find(k => trenutniKolegij && k.name === trenutniKolegij.name);
+      if (isti) {
+        const prosjek = await get(`/api/statistics/course/${isti.id}/average`);
+        podaci.push({
+          godina: godina.name,
+          prosjek: Math.round(prosjek * 10) / 10,
+        });
+      }
+    }
+    setTrendPodaci(podaci);
+  } catch (err) {
+    console.error('Greška:', err.message);
+  }
+};
 
   // pripremi podatke za graf, prosjek po komponenti
   const podaciZaGraf = () => {
