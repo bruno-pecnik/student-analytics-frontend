@@ -1,6 +1,4 @@
-const API_URL = 'https://student-analytics-production-54e9.up.railway.app';
-
-// dohvati token iz lokalnog memorije
+const API_URL = 'https://student-analytics-production-54e9.up.railway.app'; // dohvati token iz lokalnog memorije
 function getToken() {
   return localStorage.getItem('token');
 }

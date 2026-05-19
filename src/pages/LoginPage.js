@@ -18,6 +18,7 @@ function LoginPage() {
       // spremi token i podatke o korisniku u localstorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({
+        id: data.id,
         email: data.email,
         role: data.role,
         firstName: data.firstName,

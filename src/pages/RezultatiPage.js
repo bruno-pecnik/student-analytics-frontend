@@ -254,6 +254,8 @@ function RezultatiPage() {
     return rezultat;
   };
 
+
+
   const stupciTablice = () => {
     const osnovni = isStudent
       ? [
@@ -396,6 +398,29 @@ function RezultatiPage() {
             rowKey="key"
             scroll={{ x: true }}
           />
+        </Card>
+      )}
+
+      {isStudent && zapisi.length > 0 && (
+        <Card title="Usporedba s grupom" style={{ marginTop: 16 }}>
+          {komponente.map(komponenta => {
+            // bodovi studenta za ovu komponentu
+            const mojZapis = zapisi.find(z => z.component?.id === komponenta.id);
+            const mojiBodovi = mojZapis?.points ?? '-';
+
+            // prosjek svih za ovu komponentu
+            const svi = zapisi.filter(z => z.component?.id === komponenta.id);
+            let ukupno = 0;
+            for (const z of svi) ukupno += z.points || 0;
+            const prosjek = svi.length > 0 ? Math.round(ukupno / svi.length * 10) / 10 : 0;
+
+            return (
+              <div key={komponenta.id} style={{ marginBottom: 8 }}>
+                <Text strong>{komponenta.name}: </Text>
+                <Text>Tvoji bodovi: {mojiBodovi} | Prosjek grupe: {prosjek}</Text>
+              </div>
+            );
+          })}
         </Card>
       )}
 
