@@ -4,6 +4,7 @@ import KorisniciTab from '../components/admin/KorisniciTab';
 import KolegijiTab from '../components/admin/KolegijiTab';
 import AkademskeGodineTab from '../components/admin/AkademskeGodineTab';
 import PravilaOcjenjivanjaTab from '../components/admin/PravilaOcjenjivanjaTabs';
+import StudentiTab from '../components/admin/StudentiTab';
 
 const { Title } = Typography;
 
@@ -13,6 +14,7 @@ function AdminPage() {
     { key: '2', label: 'Kolegiji', children: <KolegijiTab /> },
     { key: '3', label: 'Akademske godine', children: <AkademskeGodineTab /> },
     { key: '4', label: 'Pravila ocjenjivanja', children: <PravilaOcjenjivanjaTab /> },
+    { key: '5', label: 'Studenti u grupama', children: <StudentiTab /> },
   ];
 
   return (
