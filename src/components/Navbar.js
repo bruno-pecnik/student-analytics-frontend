@@ -35,7 +35,7 @@ function Navbar() {
     <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       {/* lijeva strana, logo i navigacija */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-        <Text strong style={{ color: 'white', fontSize: 18 }}>IME_APLIKACIJE</Text>
+        <Text strong style={{ color: 'white', fontSize: 18 }}>StudTrack</Text>
         <Menu
           theme="dark"
           mode="horizontal"

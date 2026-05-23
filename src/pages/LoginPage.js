@@ -35,7 +35,7 @@ function LoginPage() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <Card style={{ width: 400 }}>
-        <Title level={2} style={{ textAlign: 'center' }}>IME_APLIKACIJE</Title>
+        <Title level={2} style={{ textAlign: 'center' }}>StudTrack</Title>
 
         {error && <Alert message={error} type="error" style={{ marginBottom: 16 }} />} {/* ako error, postoji prikaži alert */}
 
