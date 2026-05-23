@@ -1,4 +1,6 @@
 const API_URL = 'https://student-analytics-production-54e9.up.railway.app'; // dohvati token iz lokalnog memorije
+// za testiranje lokalno ... const API_URL = 'http://localhost:8080';
+// za testiranje na railwayu ... const API_URL = 'https://student-analytics-production-54e9.up.railway.app';
 function getToken() {
   return localStorage.getItem('token');
 }
