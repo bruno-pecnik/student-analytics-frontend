@@ -262,7 +262,7 @@ function RezultatiPage() {
           { title: 'Kolegij', dataIndex: 'kolegij', key: 'kolegij' }, // student vidi kolegij
         ]
       : [
-          { title: 'Student', dataIndex: 'ime', key: 'ime' }, // admin/profesor vidi ime studenta
+          { title: 'Student', dataIndex: 'ime', key: 'ime' }, // admin / profesor vidi ime studenta
           { title: 'Email', dataIndex: 'email', key: 'email' },
         ];
 
@@ -271,6 +271,17 @@ function RezultatiPage() {
         title: `${komponenta.name} (max ${komponenta.maxPoints})`,
         dataIndex: komponenta.id,
         key: komponenta.id,
+      });
+      osnovni.push({
+        title: `${komponenta.name} - obaveza`,
+        key: komponenta.id + '_obligation',
+        render: (_, record) => {
+          const zapis = zapisi.find(
+            z => z.enrollment?.id === record.key && z.component?.id === komponenta.id
+          );
+          if (!zapis) return '-';
+          return zapis.obligationMet ? 'Da' : 'Ne';
+        },
       });
     }
 
