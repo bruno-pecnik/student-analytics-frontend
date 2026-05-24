@@ -93,28 +93,7 @@ function RezultatiPage() {
   }
 }, [upisi]);
 
-  const dohvatiZapiseGrupe = async () => {
-    try {
-      const sviZapisi = [];
-      // dohvati grupu iz prvog upisa
-      for (const upis of upisi) {
-        const grupaId = upis.group?.id;
-        if (grupaId) {
-          const upisGrupe = await get(`/api/enrollments/by-group/${grupaId}`);
-          for (const upisStudenta of upisGrupe) {
-            const data = await get(`/api/records/by-enrollment/${upisStudenta.id}`);
-            for (const zapis of data) {
-              sviZapisi.push(zapis);
-            }
-          }
-          break; // samo prva grupa
-        }
-      }
-      setZapisGrupe(sviZapisi);
-    } catch (err) {
-      console.error('Greška:', err.message);
-    }
-  };
+
 
   const upisZaOdabraniKolegij = () => {
     if (!odabraniKolegijStudenta) return null;
@@ -204,22 +183,23 @@ function RezultatiPage() {
   };
 
   // dohvati komponente za sve kolegije studenta
-  const dohvatiKomponenteZaStudenta = async () => {
+  const dohvatiZapiseGrupe = async () => {
     try {
-      const sveKomponente = [];
+      const sviZapisi = [];
+      // za svaki upisani kolegij dohvati zapise cijele grupe
       for (const upis of upisi) {
-        const kolegijId = upis.group?.course?.id;
-        if (kolegijId) {
-          const data = await get(`/api/grade-components/by-course/${kolegijId}`);
-          for (const komponenta of data) {
-            // dodaj samo ako već nije u listi
-            if (!sveKomponente.find(k => k.id === komponenta.id)) {
-              sveKomponente.push(komponenta);
+        const grupaId = upis.group?.id;
+        if (grupaId) {
+          const upisGrupe = await get(`/api/enrollments/by-group/${grupaId}`);
+          for (const upisStudenta of upisGrupe) {
+            const data = await get(`/api/records/by-enrollment/${upisStudenta.id}`);
+            for (const zapis of data) {
+              sviZapisi.push(zapis);
             }
           }
         }
       }
-      setKomponente(sveKomponente);
+      setZapisGrupe(sviZapisi);
     } catch (err) {
       console.error('Greška:', err.message);
     }
