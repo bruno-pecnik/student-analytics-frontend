@@ -27,7 +27,7 @@ function RezultatiPage() {
   // učitaj podatke kad se stranica otvori
   useEffect(() => {
     if (isStudent) {
-      dohvatiUpiseStuenta(); // student automatski vidi svoje upise
+      dohvatiUpiseStudenta(); // student automatski vidi svoje upise
     } else {
       dohvatiAkademskeGodine(); // admin/profesor vidi filtere
     }
@@ -129,11 +129,28 @@ function RezultatiPage() {
     }
   };
 
-  // dohvati upise za ulogiranog studenta
-  const dohvatiUpiseStuenta = async () => {
+  const dohvatiUpiseStudenta = async () => {
     try {
       const data = await get(`/api/enrollments/by-student/${user.id}`);
-      setUpisi(data);
+
+      if (data.length === 0) {
+        setUpisi([]);
+        return;
+      }
+
+      let najnovijaGodina = null;
+      for (const upis of data) {
+        const godinaId = upis.group?.course?.academicYear?.id;
+        if (godinaId && !najnovijaGodina) {
+          najnovijaGodina = godinaId;
+        }
+      }
+
+      const filtriraniUpisi = data.filter(
+        u => u.group?.course?.academicYear?.id === najnovijaGodina
+      );
+
+      setUpisi(filtriraniUpisi);
     } catch (err) {
       console.error('Greška:', err.message);
     }
