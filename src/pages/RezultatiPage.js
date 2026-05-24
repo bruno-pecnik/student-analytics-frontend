@@ -19,6 +19,8 @@ function RezultatiPage() {
   const [zapisi, setZapisi] = useState([]);
   const [trendPodaci, setTrendPodaci] = useState([]);
   const [odabraniKolegijStudenta, setOdabraniKolegijStudenta] = useState(null);
+  const [zapisGrupe, setZapisGrupe] = useState([]);
+
 
   // odabrani filteri (samo za admin/profesor)
   const [odabranaGodina, setOdabranaGodina] = useState(null);
@@ -84,6 +86,35 @@ function RezultatiPage() {
       dohvatiTrend();
     }
   }, [odabraniKolegij]);
+
+  useEffect(() => {
+  if (isStudent && upisi.length > 0) {
+    dohvatiZapiseGrupe();
+  }
+}, [upisi]);
+
+  const dohvatiZapiseGrupe = async () => {
+    try {
+      const sviZapisi = [];
+      // dohvati grupu iz prvog upisa
+      for (const upis of upisi) {
+        const grupaId = upis.group?.id;
+        if (grupaId) {
+          const upisGrupe = await get(`/api/enrollments/by-group/${grupaId}`);
+          for (const upisStudenta of upisGrupe) {
+            const data = await get(`/api/records/by-enrollment/${upisStudenta.id}`);
+            for (const zapis of data) {
+              sviZapisi.push(zapis);
+            }
+          }
+          break; // samo prva grupa
+        }
+      }
+      setZapisGrupe(sviZapisi);
+    } catch (err) {
+      console.error('Greška:', err.message);
+    }
+  };
 
   const upisZaOdabraniKolegij = () => {
     if (!odabraniKolegijStudenta) return null;
@@ -472,8 +503,7 @@ function RezultatiPage() {
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={komponenteZaOdabraniKolegij().map(komponenta => {
                       const mojZapis = zapisZaOdabraniKolegij().find(z => z.component?.id === komponenta.id);
-                      const sviZapisiKomponente = zapisi.filter(z => z.component?.id === komponenta.id);
-                      let ukupno = 0;
+                      const sviZapisiKomponente = zapisGrupe.filter(z => z.component?.id === komponenta.id);                      let ukupno = 0;
                       for (const z of sviZapisiKomponente) ukupno += z.points || 0;
                       const prosjek = sviZapisiKomponente.length > 0 ? Math.round(ukupno / sviZapisiKomponente.length * 10) / 10 : 0;
                       return {
@@ -507,8 +537,7 @@ function RezultatiPage() {
                   ]}
                   dataSource={komponenteZaOdabraniKolegij().map(komponenta => {
                     const mojZapis = zapisZaOdabraniKolegij().find(z => z.component?.id === komponenta.id);
-                    const sviZapisiKomponente = zapisi.filter(z => z.component?.id === komponenta.id);
-                    let ukupno = 0;
+                    const sviZapisiKomponente = zapisGrupe.filter(z => z.component?.id === komponenta.id);                    let ukupno = 0;
                     for (const z of sviZapisiKomponente) ukupno += z.points || 0;
                     const prosjek = sviZapisiKomponente.length > 0 ? Math.round(ukupno / sviZapisiKomponente.length * 10) / 10 : 0;
                     return {
