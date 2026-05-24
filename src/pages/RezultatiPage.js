@@ -18,6 +18,7 @@ function RezultatiPage() {
   const [upisi, setUpisi] = useState([]);
   const [zapisi, setZapisi] = useState([]);
   const [trendPodaci, setTrendPodaci] = useState([]);
+  const [odabraniKolegijStudenta, setOdabraniKolegijStudenta] = useState(null);
 
   // odabrani filteri (samo za admin/profesor)
   const [odabranaGodina, setOdabranaGodina] = useState(null);
@@ -83,6 +84,21 @@ function RezultatiPage() {
       dohvatiTrend();
     }
   }, [odabraniKolegij]);
+
+  const upisZaOdabraniKolegij = () => {
+    if (!odabraniKolegijStudenta) return null;
+    return upisi.find(u => u.group?.course?.id === odabraniKolegijStudenta);
+  };
+
+  const zapisZaOdabraniKolegij = () => {
+    const upis = upisZaOdabraniKolegij();
+    if (!upis) return [];
+    return zapisi.filter(z => z.enrollment?.id === upis.id);
+  };
+
+  const komponenteZaOdabraniKolegij = () => {
+    return komponente.filter(k => k.course?.id === odabraniKolegijStudenta);
+  };
 
   const dohvatiAkademskeGodine = async () => {
     try {
@@ -394,7 +410,7 @@ function RezultatiPage() {
         </Card>
       )}
 
-      {/* line chart - trend kroz akademske godine */}
+      {/* line chart trend kroz akademske godine */}
       {trendPodaci.length > 0 && (
         <Card title="Trend prosjeka kroz akademske godine" style={{ marginBottom: 24 }}>
           <ResponsiveContainer width="100%" height={300}>
@@ -418,8 +434,11 @@ function RezultatiPage() {
       )}
 
       {/* tablica */}
-      {(odabranaGrupa || isStudent) && (
-        <Card title={isStudent ? 'Moji rezultati' : 'Rezultati studenata'}>
+      
+
+      {/* tablica - samo za admin/profesor */}
+      {!isStudent && odabranaGrupa && (
+        <Card title="Rezultati studenata">
           <Table
             columns={stupciTablice()}
             dataSource={podaciZaTablicu()}
@@ -429,27 +448,91 @@ function RezultatiPage() {
         </Card>
       )}
 
-      {isStudent && zapisi.length > 0 && (
-        <Card title="Usporedba s grupom" style={{ marginTop: 16 }}>
-          {komponente.map(komponenta => {
-            // bodovi studenta za ovu komponentu
-            const mojZapis = zapisi.find(z => z.component?.id === komponenta.id);
-            const mojiBodovi = mojZapis?.points ?? '-';
+      {/* student view */}
+      {isStudent && (
+        <div>
+          <Card style={{ marginBottom: 24 }}>
+            <Text strong>Odaberi kolegij:</Text>
+            <Select
+              style={{ width: '100%', marginTop: 8 }}
+              placeholder="Odaberi kolegij"
+              onChange={(value) => setOdabraniKolegijStudenta(value)}
+              value={odabraniKolegijStudenta}
+              options={upisi.map(u => ({
+                value: u.group?.course?.id,
+                label: u.group?.course?.name,
+              }))}
+            />
+          </Card>
 
-            // prosjek svih za ovu komponentu
-            const svi = zapisi.filter(z => z.component?.id === komponenta.id);
-            let ukupno = 0;
-            for (const z of svi) ukupno += z.points || 0;
-            const prosjek = svi.length > 0 ? Math.round(ukupno / svi.length * 10) / 10 : 0;
+          {odabraniKolegijStudenta && (
+            <>
+              {zapisZaOdabraniKolegij().length > 0 && (
+                <Card title="Moji bodovi vs prosjek grupe" style={{ marginBottom: 24 }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={komponenteZaOdabraniKolegij().map(komponenta => {
+                      const mojZapis = zapisZaOdabraniKolegij().find(z => z.component?.id === komponenta.id);
+                      const sviZapisiKomponente = zapisi.filter(z => z.component?.id === komponenta.id);
+                      let ukupno = 0;
+                      for (const z of sviZapisiKomponente) ukupno += z.points || 0;
+                      const prosjek = sviZapisiKomponente.length > 0 ? Math.round(ukupno / sviZapisiKomponente.length * 10) / 10 : 0;
+                      return {
+                        naziv: komponenta.name,
+                        mojiBodovi: mojZapis?.points ?? 0,
+                        prosjekGrupe: prosjek,
+                        maksimum: komponenta.maxPoints,
+                      };
+                    })}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="naziv" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="mojiBodovi" name="Moji bodovi" fill="#1677ff" />
+                      <Bar dataKey="prosjekGrupe" name="Prosjek grupe" fill="#52c41a" />
+                      <Bar dataKey="maksimum" name="Maksimum" fill="#d9d9d9" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Card>
+              )}
 
-            return (
-              <div key={komponenta.id} style={{ marginBottom: 8 }}>
-                <Text strong>{komponenta.name}: </Text>
-                <Text>Tvoji bodovi: {mojiBodovi} | Prosjek grupe: {prosjek}</Text>
-              </div>
-            );
-          })}
-        </Card>
+              <Card title="Moji rezultati po komponentama">
+                <Table
+                  columns={[
+                    { title: 'Komponenta', dataIndex: 'naziv', key: 'naziv' },
+                    { title: 'Moji bodovi', dataIndex: 'mojiBodovi', key: 'mojiBodovi' },
+                    { title: 'Maksimum', dataIndex: 'maksimum', key: 'maksimum' },
+                    { title: 'Prosjek grupe', dataIndex: 'prosjekGrupe', key: 'prosjekGrupe' },
+                    { title: 'Obaveza', dataIndex: 'obaveza', key: 'obaveza' },
+                  ]}
+                  dataSource={komponenteZaOdabraniKolegij().map(komponenta => {
+                    const mojZapis = zapisZaOdabraniKolegij().find(z => z.component?.id === komponenta.id);
+                    const sviZapisiKomponente = zapisi.filter(z => z.component?.id === komponenta.id);
+                    let ukupno = 0;
+                    for (const z of sviZapisiKomponente) ukupno += z.points || 0;
+                    const prosjek = sviZapisiKomponente.length > 0 ? Math.round(ukupno / sviZapisiKomponente.length * 10) / 10 : 0;
+                    return {
+                      key: komponenta.id,
+                      naziv: komponenta.name,
+                      mojiBodovi: mojZapis?.points ?? '-',
+                      maksimum: komponenta.maxPoints,
+                      prosjekGrupe: prosjek,
+                      obaveza: mojZapis?.obligationMet ? 'Da' : 'Ne',
+                    };
+                  })}
+                  rowKey="key"
+                  pagination={false}
+                />
+              </Card>
+            </>
+          )}
+
+          {!odabraniKolegijStudenta && upisi.length > 0 && (
+            <Card>
+              <Text type="secondary">Odaberite kolegij za prikaz rezultata.</Text>
+            </Card>
+          )}
+        </div>
       )}
 
       {/* poruka ako ništa nije odabrano (samo za admin/profesor) */}
@@ -463,3 +546,9 @@ function RezultatiPage() {
 }
 
 export default RezultatiPage;
+
+
+
+
+
+      
