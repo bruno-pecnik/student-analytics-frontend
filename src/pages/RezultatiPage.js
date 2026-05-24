@@ -394,7 +394,7 @@ function RezultatiPage() {
       />
       )}
       {/* graf uvijek vidljiv kad ima podataka */}
-      {podaciZaGraf().length > 0 && (
+      {!isStudent && podaciZaGraf().length > 0 && (
         <Card title="Prosjek bodova po komponenti" style={{ marginBottom: 24 }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={podaciZaGraf()}>
