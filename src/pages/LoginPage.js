@@ -41,7 +41,7 @@ function LoginPage() {
 
         <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Email je obavezan.' }]}>
-            <Input placeholder="ime@fer.hr" />
+            <Input placeholder="Email adresa" />
           </Form.Item>
 
           <Form.Item label="Lozinka" name="password" rules={[{ required: true, message: 'Lozinka je obavezna.' }]}>
