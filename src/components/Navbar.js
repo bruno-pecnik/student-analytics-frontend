@@ -21,7 +21,7 @@ function Navbar() {
 
   // stavke navigacije ovisno o ulozi
   const menuItems = [
-    { key: '/home', label: 'Home' },
+    { key: '/home', label: 'Početna' },
     { key: '/rezultati', label: 'Rezultati' },
     { key: '/profil', label: 'Profil' },
   ];
