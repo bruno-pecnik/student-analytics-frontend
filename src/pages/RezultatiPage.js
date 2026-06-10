@@ -183,6 +183,27 @@ function RezultatiPage() {
   };
 
   // dohvati komponente za sve kolegije studenta
+const dohvatiKomponenteZaStudenta = async () => {
+  try {
+    const sveKomponente = [];
+    for (const upis of upisi) {
+      const kolegijId = upis.group?.course?.id;
+      if (kolegijId) {
+        const data = await get(`/api/grade-components/by-course/${kolegijId}`);
+        for (const komponenta of data) {
+          if (!sveKomponente.find(k => k.id === komponenta.id)) {
+            sveKomponente.push(komponenta);
+          }
+        }
+      }
+    }
+    setKomponente(sveKomponente);
+  } catch (err) {
+    console.error('Greška:', err.message);
+  }
+};
+
+  // dohvati komponente za sve kolegije studenta
   const dohvatiZapiseGrupe = async () => {
     try {
       const sviZapisi = [];
