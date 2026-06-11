@@ -30,7 +30,7 @@ function HomePage() { // jsx koji react pretvori u html
             hoverable
             onClick={() => navigate('/profil')}
           >
-            <Text>Pregledajte i uredite svoj profil.</Text>
+            <Text>Pregledajte svoj profil.</Text>
           </Card>
         </Col>
 

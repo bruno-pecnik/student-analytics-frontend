@@ -18,11 +18,11 @@ function UnosRezultata({ kolegijId, komponente, onSuccess }) {
       header: true, // prva linija je header (email, bodovi)
       skipEmptyLines: true,
       complete: (rezultat) => {
-        // rezultat.data je lista redova iz CSV-a
+        // rezultat.data je lista redova iz CSVaa
         setParsiraniPodaci(rezultat.data);
       },
     });
-    return false; // sprječi automatski upload
+    return false; 
   };
 
   // spremi rezultate u bazu
@@ -40,7 +40,7 @@ function UnosRezultata({ kolegijId, komponente, onSuccess }) {
     let uspjesno = 0;
     let neuspjesno = 0;
 
-    // dohvati sve korisnike jednom prije petlje
+    // dohvati sve korisnike
     const korisnici = await get('/api/users');
 
     for (const red of parsiraniPodaci) {

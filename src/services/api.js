@@ -1,15 +1,15 @@
-const API_URL = 'https://student-analytics-production-54e9.up.railway.app'; // dohvati token iz lokalnog memorije
-// za testiranje lokalno ... const API_URL = 'http://localhost:8080';
-// za testiranje na railwayu ... const API_URL = 'https://student-analytics-production-54e9.up.railway.app';
+const API_URL = 'https://student-analytics-production-54e9.up.railway.app'; 
+// za testiranje lokalno const API_URL = 'http://localhost:8080';
+// za testiranje na railwayu const API_URL = 'https://student-analytics-production-54e9.up.railway.app';
 function getToken() {
   return localStorage.getItem('token');
 }
 
 // login poziv
 export async function login(email, password) {
-  const response = await fetch(`${API_URL}/api/auth/login`, { // response je cijeli odgovor s backenda, ne samo data već i status #, header, body ...
+  const response = await fetch(`${API_URL}/api/auth/login`, { // response je cijeli odgovor s backenda
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, // šaljem podatke u JSON formatu
+    headers: { 'Content-Type': 'application/json' }, // šaljem podatke kao JSON format
     body: JSON.stringify({ email, password }),
   });
   const data = await response.json();
@@ -21,11 +21,11 @@ export async function login(email, password) {
 
 // dohvati podatak
 export async function get(path) {
-  const response = await fetch(`${API_URL}${path}`, { // šalje zahtjev backendu na API_URL (URL backenda)
-                                                        // zahtjev za GET je po defaultu, ne treba ga pisat
-    headers: { Authorization: `Bearer ${getToken()}` }, // pošalje token u requestu kao header 
+  const response = await fetch(`${API_URL}${path}`, { 
+                                                        
+    headers: { Authorization: `Bearer ${getToken()}` },  
   });
-  const data = await response.json(); // odgovor backenda pretvara u JS objekt 'data' kako bismo koristili te podatke
+  const data = await response.json(); 
   if (!response.ok) {
     throw new Error(data.message || 'Greška.');
   }
@@ -35,7 +35,7 @@ export async function get(path) {
 // pošalji novi podatak
 export async function post(path, body) {
   const response = await fetch(`${API_URL}${path}`, {
-    method: 'POST', // zahtjev za POST
+    method: 'POST', 
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${getToken()}`,
@@ -52,7 +52,7 @@ export async function post(path, body) {
 // promijeni podatak
 export async function put(path, body) {
   const response = await fetch(`${API_URL}${path}`, { 
-    method: 'PUT', // zahtjev za PUT
+    method: 'PUT', 
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${getToken()}`,
@@ -69,7 +69,7 @@ export async function put(path, body) {
 // izbriši podatak
 export async function del(path) { 
   const response = await fetch(`${API_URL}${path}`, {
-    method: 'DELETE', // zahtjev za DELETE
+    method: 'DELETE', 
     headers: { Authorization: `Bearer ${getToken()}` },
   });
   if (!response.ok) {

@@ -22,12 +22,10 @@ function RezultatiPage() {
   const [zapisGrupe, setZapisGrupe] = useState([]);
 
 
-  // odabrani filteri (samo za admin/profesor)
   const [odabranaGodina, setOdabranaGodina] = useState(null);
   const [odabraniKolegij, setOdabraniKolegij] = useState(null);
   const [odabranaGrupa, setOdabranaGrupa] = useState(null);
 
-  // učitaj podatke kad se stranica otvori
   useEffect(() => {
     if (isStudent) {
       dohvatiUpiseStudenta(); // student automatski vidi svoje upise
@@ -36,7 +34,7 @@ function RezultatiPage() {
     }
   }, []);
 
-  // kad se odabere godina, učitaj kolegije (samo admin/profesor)
+  // kad se odabere godina, učitaj kolegije 
   useEffect(() => {
     if (odabranaGodina) {
       dohvatiKolegije(odabranaGodina);
@@ -182,7 +180,6 @@ function RezultatiPage() {
     }
   };
 
-  // dohvati komponente za sve kolegije studenta
 const dohvatiKomponenteZaStudenta = async () => {
   try {
     const sveKomponente = [];
@@ -203,11 +200,9 @@ const dohvatiKomponenteZaStudenta = async () => {
   }
 };
 
-  // dohvati komponente za sve kolegije studenta
   const dohvatiZapiseGrupe = async () => {
     try {
       const sviZapisi = [];
-      // za svaki upisani kolegij dohvati zapise cijele grupe
       for (const upis of upisi) {
         const grupaId = upis.group?.id;
         if (grupaId) {
@@ -287,7 +282,6 @@ const dohvatiKomponenteZaStudenta = async () => {
     return rezultat;
   };
 
-  // pripremi podatke za tablicu, za studenta prikazuje samo njegove rezultate
   const podaciZaTablicu = () => {
     const rezultat = [];
     for (const upis of upisi) {
@@ -324,10 +318,10 @@ const dohvatiKomponenteZaStudenta = async () => {
   const stupciTablice = () => {
     const osnovni = isStudent
       ? [
-          { title: 'Kolegij', dataIndex: 'kolegij', key: 'kolegij' }, // student vidi kolegij
+          { title: 'Kolegij', dataIndex: 'kolegij', key: 'kolegij' }, 
         ]
       : [
-          { title: 'Student', dataIndex: 'ime', key: 'ime' }, // admin / profesor vidi ime studenta
+          { title: 'Student', dataIndex: 'ime', key: 'ime' }, 
           { title: 'Email', dataIndex: 'email', key: 'email' },
         ];
 
@@ -468,7 +462,7 @@ const dohvatiKomponenteZaStudenta = async () => {
       {/* tablica */}
       
 
-      {/* tablica - samo za admin/profesor */}
+      {/* tablica samo za admin/profesor */}
       {!isStudent && odabranaGrupa && (
         <Card title="Rezultati studenata">
           <Table
@@ -504,7 +498,8 @@ const dohvatiKomponenteZaStudenta = async () => {
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={komponenteZaOdabraniKolegij().map(komponenta => {
                       const mojZapis = zapisZaOdabraniKolegij().find(z => z.component?.id === komponenta.id);
-                      const sviZapisiKomponente = zapisGrupe.filter(z => z.component?.id === komponenta.id);                      let ukupno = 0;
+                      const sviZapisiKomponente = zapisGrupe.filter(z => z.component?.id === komponenta.id);                      
+                      let ukupno = 0;
                       for (const z of sviZapisiKomponente) ukupno += z.points || 0;
                       const prosjek = sviZapisiKomponente.length > 0 ? Math.round(ukupno / sviZapisiKomponente.length * 10) / 10 : 0;
                       return {
@@ -565,7 +560,7 @@ const dohvatiKomponenteZaStudenta = async () => {
         </div>
       )}
 
-      {/* poruka ako ništa nije odabrano (samo za admin/profesor) */}
+      {/* poruka ako ništa nije odabrano */}
       {!isStudent && !odabranaGodina && (
         <Card>
           <Text type="secondary">Odaberite akademsku godinu za prikaz rezultata.</Text>

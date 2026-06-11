@@ -10,10 +10,10 @@ import NotFoundPage from './pages/NotFoundPage';
 import RezultatiPage from './pages/RezultatiPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
-const { Content } = Layout; // antdesign, kontenjer za stranicu
+const { Content } = Layout; // antdesigmn kontenjer za stranicu
 
 function App() {
-  const isLoggedIn = localStorage.getItem('token'); // ako token postoji, znači da je user ulogiran
+  const isLoggedIn = localStorage.getItem('token'); // ako token postoji znači da je user ulogiran
 
   return (
     <Router>
@@ -32,14 +32,14 @@ function App() {
                   <Route path="/profil" element={<ProfilPage />} />
                   <Route path="/rezultati" element={<RezultatiPage />} />
 
-                  {/* admin stranica, samo ADMIN može ući */}
+                  {/* admin stranica*/}
                   <Route path="/admin" element={
                     <ProtectedRoute dozvoljeneUloge={['ADMIN']}>
                       <AdminPage />
                     </ProtectedRoute>
                   } />
 
-                  {/* ako nijedna ruta ne postoji, pokaži 404 */}
+                  {/* ako nijedna ruta ne postoji pokaži 404 */}
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </Content>
