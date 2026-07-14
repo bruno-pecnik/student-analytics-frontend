@@ -86,10 +86,10 @@ function RezultatiPage() {
   }, [odabraniKolegij]);
 
   useEffect(() => {
-  if (isStudent && upisi.length > 0) {
-    dohvatiZapiseGrupe();
-  }
-}, [upisi]);
+    if (isStudent && odabraniKolegijStudenta) {
+      dohvatiZapiseGrupe();
+    }
+  }, [odabraniKolegijStudenta]);
 
 
 
@@ -202,17 +202,17 @@ const dohvatiKomponenteZaStudenta = async () => {
 
   const dohvatiZapiseGrupe = async () => {
     try {
+      setZapisGrupe([]); // makni podatke prošlog kolegija dok se novi ne učitaju
+      const upis = upisZaOdabraniKolegij();
+      const grupaId = upis?.group?.id;
+      if (!grupaId) return;
+
+      const upisGrupe = await get(`/api/enrollments/by-group/${grupaId}`);
       const sviZapisi = [];
-      for (const upis of upisi) {
-        const grupaId = upis.group?.id;
-        if (grupaId) {
-          const upisGrupe = await get(`/api/enrollments/by-group/${grupaId}`);
-          for (const upisStudenta of upisGrupe) {
-            const data = await get(`/api/records/by-enrollment/${upisStudenta.id}`);
-            for (const zapis of data) {
-              sviZapisi.push(zapis);
-            }
-          }
+      for (const upisStudenta of upisGrupe) {
+        const data = await get(`/api/records/by-enrollment/${upisStudenta.id}`);
+        for (const zapis of data) {
+          sviZapisi.push(zapis);
         }
       }
       setZapisGrupe(sviZapisi);
